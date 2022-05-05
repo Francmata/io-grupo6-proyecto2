@@ -85,31 +85,6 @@ def get_Torres(lista_figuras,num):
     return get_Torres( [listaTmp] + lista_figuras[2:],2)
 
 
-""" def getTorres(combinacion:list,torres:list[Torre],i:int=0,j:int=1):
-    if i == len(combinacion[0]):
-        return torres
-    else:
-        if torres != []:
-            torre = Torre()
-            torre.bloques += combinacion[i]
-        else:
-            for bloque in combinacion[j]:
-
-            
-            return getTorres(combinacion,torres,i+1,j)
-
-def getTorre(combinacion:list,torre:Torre=Torre(),i=0,j=1):
-    if j >= len(combinacion):
-        return torres
-    else:
-        if torre.bloques == []:   
-            torre.bloques += combinacion[i]
-        else:
-            for x in range(1,len(combinacion)):
-                torre.bloques += bloque
-            getTorre(combinacion,i,j+1)
-"""
-
 # -----------------------------------------------------------------------------------------------
 #endregion Fuerza Bruta 
 
