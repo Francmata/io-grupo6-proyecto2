@@ -102,12 +102,12 @@ if __name__ == '__main__':
     #forma_Apropiada_Dos_Fases_Fase_1(None,None)
     #--h es un parámetro de ingreso opcional
     # python ./contenedor.py algoritmo archivo.txt
-    if sys.argv[1] == "1":
+    if sys.argv[0] == "1":
         archivo = sys.argv[2].split('.')
         Lineas = Util.abrir_Archivo(sys.argv[2])
         print(Lineas)
         contenedorFuerzaBruta(Lineas)
-    elif sys.argv[1] == "2":
+    elif sys.argv[0] == "2":
         archivo = sys.argv[2].split('.')
         Lineas = Util.abrir_Archivo(sys.argv[2])
         print(Lineas)

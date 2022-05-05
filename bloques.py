@@ -1,5 +1,4 @@
 # Imports
-from webbrowser import get
 import Util
 import time
 import sys
@@ -49,18 +48,8 @@ def bloquesFuerzaBruta(datos:list):
         bloque3.ancho  = bloque.largo
         bloque3.altura = bloque.ancho
         permutacionesBloques.append([bloque,bloque2,bloque3])
-    
-    #for permutacion in permutacionesBloques:
-    #    print("-----------------------")
-    #    for bloque in permutacion:
-    #        print(f'{bloque.largo} / {bloque.ancho} / {bloque.altura}')
-    #print(permutacionesBloques)
 
-    combinacionBloques = Util.get_Lista_Combinaciones(permutacionesBloques)
-    
-    torresValidas = []
-
-    for combinacion in combinacionBloques:
+    for combinacion in permutacionesBloques:
         print("*******************************************************")
         for permutacionbloque in combinacion:
             print("-----------------------")
@@ -68,15 +57,35 @@ def bloquesFuerzaBruta(datos:list):
                 print(f'{bloque.largo} / {bloque.ancho} / {bloque.altura}')
     
     # Combinaciones Validas
-    #for indexCombinacion in range(len(combinacionBloques)):
-    #    for indexBloque in range(len(combinacionBloques[indexCombinacion])):
-    torres_Total = []
+    
+    torres_Total = get_Torres(permutacionesBloques,2)
+    
+    print(torres_Total)
+    """
     for combin in combinacionBloques:
         torres = []
         torres_Total += getTorres(combin,torres)
     print(torres)
+    """
 
-def getTorres(combinacion:list,torres:list[Torre],i:int=0,j:int=1):
+def get_Torres(lista_figuras,num):
+    if(len(lista_figuras)==1): return lista_figuras
+    lista1=lista_figuras[0]
+    lista2=lista_figuras[1]
+    listaTmp=[]
+    
+    for i in range(len(lista1)):
+
+        for j in range(len(lista2)):
+            if(num == 1): listaTmp.append([lista1[i]]+[lista2[j]])
+
+            else:
+                listaTmp.append(lista1[i]+[lista2[j]])
+
+    return get_Torres( [listaTmp] + lista_figuras[2:],2)
+
+
+""" def getTorres(combinacion:list,torres:list[Torre],i:int=0,j:int=1):
     if i == len(combinacion[0]):
         return torres
     else:
@@ -88,8 +97,6 @@ def getTorres(combinacion:list,torres:list[Torre],i:int=0,j:int=1):
 
             
             return getTorres(combinacion,torres,i+1,j)
-            
-            return getTorres(combinacion,torres,i,j+1)
 
 def getTorre(combinacion:list,torre:Torre=Torre(),i=0,j=1):
     if j >= len(combinacion):
@@ -101,23 +108,24 @@ def getTorre(combinacion:list,torre:Torre=Torre(),i=0,j=1):
             for x in range(1,len(combinacion)):
                 torre.bloques += bloque
             getTorre(combinacion,i,j+1)
-
+"""
 
 # -----------------------------------------------------------------------------------------------
 #endregion Fuerza Bruta 
 
 
 if __name__ == '__main__':
-    #forma_Apropiada_Dos_Fases_Fase_1(None,None)
-    #--h es un parámetro de ingreso opcional
-    # python ./contenedor.py algoritmo archivo.txt
-    if sys.argv[1] == "1":
+    # python ./bloques.py algoritmo archivo.txt
+    # ./bloques.py 1 bloques1.txt
+    if sys.argv[0] == "1":
+        print("entra")
         archivo = sys.argv[2].split('.')
         Lineas = Util.abrir_Archivo(sys.argv[2])
         print(Lineas)
         bloquesFuerzaBruta(Lineas)
-    elif sys.argv[1] == "2":
+    elif sys.argv[0] == "2":
         archivo = sys.argv[2].split('.')
         Lineas = Util.abrir_Archivo(sys.argv[2])
         print(Lineas)
         #contenedorProgramacionDinamica(Lineas)
+
