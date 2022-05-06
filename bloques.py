@@ -49,27 +49,38 @@ def bloquesFuerzaBruta(datos:list):
         bloque3.altura = bloque.ancho
         permutacionesBloques.append([bloque,bloque2,bloque3])
 
-    for combinacion in permutacionesBloques:
-        print("*******************************************************")
-        for permutacionbloque in combinacion:
-            print("-----------------------")
-            for bloque in permutacionbloque:
+        
+     
+    combinacionBloques = Util.get_Lista_Combinaciones(permutacionesBloques) 
+     
+    """
+    for combinacion in combinacionBloques: 
+        print("*******************************************************") 
+        for permutacionbloque in combinacion: 
+            print("-----------------------") 
+            for bloque in permutacionbloque: 
                 print(f'{bloque.largo} / {bloque.ancho} / {bloque.altura}')
-    
+    """
     # Combinaciones Validas
     
     torres_Total = get_Torres(permutacionesBloques,2)
-    
-    print(torres_Total)
+    #print(torres_Total)
     """
-    for combin in combinacionBloques:
-        torres = []
-        torres_Total += getTorres(combin,torres)
-    print(torres)
+    for torre in torres_Total: 
+        print("*******************************************************") 
+        for permutacionbloque in torre: 
+            print("-----------------------") 
+            for bloque in permutacionbloque: 
+                print(f'{bloque.largo} / {bloque.ancho} / {bloque.altura}')
+    print("torres_Total")
+    
+
+    
+    
     """
 
 def get_Torres(lista_figuras,num):
-    if(len(lista_figuras)==1): return lista_figuras
+    if(len(lista_figuras)==1): return lista_figuras[0]
     lista1=lista_figuras[0]
     lista2=lista_figuras[1]
     listaTmp=[]
@@ -77,28 +88,34 @@ def get_Torres(lista_figuras,num):
     for i in range(len(lista1)):
 
         for j in range(len(lista2)):
+            
+
             if(num == 1): listaTmp.append([lista1[i]]+[lista2[j]])
 
             else:
-                listaTmp.append(lista1[i]+[lista2[j]])
+                
+                listaTmp.append([lista1[i]]+[lista2[j]])
 
-    return get_Torres( [listaTmp] + lista_figuras[2:],2)
+   
+    return get_Torres( listaTmp + lista_figuras[2:],2)
 
 
 # -----------------------------------------------------------------------------------------------
 #endregion Fuerza Bruta 
 
+def imprimirBloques(bloque):
+    print(f'{bloque.largo} / {bloque.ancho} / {bloque.altura}')
 
 if __name__ == '__main__':
     # python ./bloques.py algoritmo archivo.txt
     # ./bloques.py 1 bloques1.txt
-    if sys.argv[0] == "1":
-        print("entra")
+    if sys.argv[1] == "1":
+        
         archivo = sys.argv[2].split('.')
         Lineas = Util.abrir_Archivo(sys.argv[2])
         print(Lineas)
         bloquesFuerzaBruta(Lineas)
-    elif sys.argv[0] == "2":
+    elif sys.argv[1] == "2":
         archivo = sys.argv[2].split('.')
         Lineas = Util.abrir_Archivo(sys.argv[2])
         print(Lineas)
