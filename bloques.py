@@ -63,24 +63,35 @@ def bloquesFuerzaBruta(datos:list):
     """
     # Combinaciones Validas
     
-    torres_Total = get_Torres(permutacionesBloques,2)
-    #print(torres_Total)
-    """
-    for torre in torres_Total: 
-        print("*******************************************************") 
-        for permutacionbloque in torre: 
-            print("-----------------------") 
-            for bloque in permutacionbloque: 
+    torres_Total = []#get_Torres(permutacionesBloques,1)
+    
+    for combinacion in combinacionBloques:
+        temporal=get_Torres(combinacion,1)
+        #print(temporal)
+        torres_Total.append( temporal)
+    cont = 0
+    
+    for torre in torres_Total:      
+        for combinacion in torre:
+            print("*********************TORRE**********************************")
+            for bloque in combinacion: 
+                #print("-------------------------")
+               #print(bloque)
+                cont+=1
                 print(f'{bloque.largo} / {bloque.ancho} / {bloque.altura}')
-    print("torres_Total")
-    
-
-    
-    
-    """
+                
+    print(cont)
 
 def get_Torres(lista_figuras,num):
-    if(len(lista_figuras)==1): return lista_figuras[0]
+    
+    if(len(lista_figuras)==1 and num == 1): 
+        resultado = []
+        for permutacion in lista_figuras[0]:
+            resultado.append([permutacion])
+        return resultado
+
+    elif(len(lista_figuras)==1): return lista_figuras[0]
+
     lista1=lista_figuras[0]
     lista2=lista_figuras[1]
     listaTmp=[]
@@ -90,14 +101,18 @@ def get_Torres(lista_figuras,num):
         for j in range(len(lista2)):
             
 
-            if(num == 1): listaTmp.append([lista1[i]]+[lista2[j]])
-
-            else:
-                
+            if(num == 1): 
+               # print("lista1 if",lista1[i])
+                #print("lista2 if",lista2[j])
                 listaTmp.append([lista1[i]]+[lista2[j]])
 
-   
-    return get_Torres( listaTmp + lista_figuras[2:],2)
+            else:
+               # print("lista1 else",lista1[i])
+               # print("lista2 else",lista2[j])
+                listaTmp.append(lista1[i]+[lista2[j]])
+
+    
+    return get_Torres( [listaTmp] + lista_figuras[2:],2)
 
 
 # -----------------------------------------------------------------------------------------------
