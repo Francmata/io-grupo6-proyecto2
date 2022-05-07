@@ -3,18 +3,51 @@ import Util
 import time
 import sys
 
+
 #region Fuerza Bruta 
 # -----------------------------------------------------------------------------------------------
 def minaFuerzaBruta(datos:list):
-    return
+    caminos_posibles=[]
+    largo=len(datos)
+    ancho= len(datos[0])
+    encontrar_caminos( largo, ancho, 0, 0, [[0,0]], caminos_posibles)
+    print(caminos_posibles)
+
+
+def encontrar_caminos(largo, ancho, i, j, caminos, caminos_posibles):
+    print(caminos)
+    if i== largo-1 or j==ancho-1: 
+        caminos_posibles.append(caminos)
+        return 
+    for camino in (caminos):
+        i= camino
+        j=camino[0]
+        #borde arriba
+        if i==0:
+            encontrar_caminos(largo, ancho, i, j+1, (camino+[[i, j+1],[i+1, j+1]]), caminos_posibles) 
+        #borde abajo
+        elif i==largo-1:
+            encontrar_caminos(largo, ancho, i, j+1, (camino+[[i, j+1],[i-1, j+1]]), caminos_posibles)
+        #medio
+        else:
+            encontrar_caminos(largo, ancho, i, j+1, (camino+[[i, j+1], [i+1, j+1], [i-1, j+1]]), caminos_posibles) 
+
+"""
+def encontrar_caminos(matriz, i, j, caso):
+    print(i, j)
+    if caso==1:
+        return [(i, j)(i, j+1, matriz[i][j]), (i+1, j+1, matriz[i+1][j+1])]
+    elif caso==2:
+        return [(i, j+1, matriz[i][j+1]), (i-1, j+1, matriz[i-1][j+1])]
+    else:
+        return [(i, j+1, matriz[i][j+1]),(i-1, j+1, matriz[i-1][j+1]),(i+1, j+1, matriz[i+1][j+1])]
+"""
 # -----------------------------------------------------------------------------------------------
 #endregion Fuerza Bruta 
 
 
 if __name__ == '__main__':
-    #forma_Apropiada_Dos_Fases_Fase_1(None,None)
-    #--h es un parámetro de ingreso opcional
-    # python ./contenedor.py algoritmo archivo.txt
+    # python ./mina.py algoritmo archivo.txt
     if sys.argv[1] == "1":
         archivo = sys.argv[2].split('.')
         Lineas = Util.abrir_Archivo(sys.argv[2])
@@ -24,4 +57,3 @@ if __name__ == '__main__':
         archivo = sys.argv[2].split('.')
         Lineas = Util.abrir_Archivo(sys.argv[2])
         print(Lineas)
-        #contenedorProgramacionDinamica(Lineas)

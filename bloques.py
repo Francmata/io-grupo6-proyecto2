@@ -34,6 +34,7 @@ class Torre():
 #region Fuerza Bruta 
 # -----------------------------------------------------------------------------------------------
 def bloquesFuerzaBruta(datos:list):
+    start = time.time()
     bloques = []
     for bloque in datos:
         bloques.append(Util.permutaciones(bloque, len(bloque)))
@@ -124,10 +125,13 @@ def bloquesFuerzaBruta(datos:list):
     #    for bloque in torre.bloques:
     #        print(f'{bloque.largo} / {bloque.ancho} / {bloque.altura} ')  
     
+    end = time.time()
+    
     for torre in torreMasAltas:
         print("------------------------------")
         print(f'Altura: {torre.getAltura()}')
         print(", ".join([f'({bloque.largo}, {bloque.ancho}, {bloque.altura})' for bloque in torre.bloques]))
+    print(f'\n Tiempo de ejecución: {end-start} segundos')
 
 def get_Torres(lista_figuras,num):
     
@@ -147,7 +151,6 @@ def get_Torres(lista_figuras,num):
 
         for j in range(len(lista2)):
             
-
             if(num == 1): 
                # print("lista1 if",lista1[i])
                 #print("lista2 if",lista2[j])
