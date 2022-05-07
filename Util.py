@@ -101,7 +101,7 @@ def get_Lista_Permutaciones(lista:list):
 #endregion Permutaciones
 
 
-lista = ['cereza', 'chocolate', 'fresa'] #,'nuez', 'vainilla'
-print(permutaciones(lista, len(lista))) 
+#lista = [1, 3, 2] #,'nuez', 'vainilla'
+#print(permutaciones(lista, len(lista))) 
 
 # 1,2,3 -> 2,3,1 -> 3,1,2

@@ -20,6 +20,14 @@ class Torre():
         for bloque in self.bloques:
             altura += bloque.altura
         return altura
+    def esValida(self):
+        if len(self.bloques) == 1: return True
+        for i in range(len(self.bloques)-1):
+            bloqueActual:Bloque    = self.bloques[i]
+            bloqueSiguiente:Bloque = self.bloques[i+1]
+            if (bloqueActual.largo <= bloqueSiguiente.largo) or (bloqueActual.ancho <= bloqueSiguiente.ancho):
+                return False
+        return True
 # -----------------------------------------------------------------------------------------------
 #endregion Classes
 
@@ -27,60 +35,99 @@ class Torre():
 # -----------------------------------------------------------------------------------------------
 def bloquesFuerzaBruta(datos:list):
     bloques = []
-    cont = 1
-    for block in datos:
-        bloque = Bloque()
-        bloque.largo = block[0]
-        bloque.ancho = block[1]      
-        bloque.altura = block[2]
-        bloques.append(bloque)
-        cont+=1
-
-    # Hacer permutaciones del bloque
+    for bloque in datos:
+        bloques.append(Util.permutaciones(bloque, len(bloque)))
+    
     permutacionesBloques = []
-    for bloque in bloques:
-        bloque2 = Bloque()
-        bloque2.largo  = bloque.ancho
-        bloque2.ancho  = bloque.altura
-        bloque2.altura = bloque.largo
-        bloque3 = Bloque()
-        bloque3.largo  = bloque.altura
-        bloque3.ancho  = bloque.largo
-        bloque3.altura = bloque.ancho
-        permutacionesBloques.append([bloque,bloque2,bloque3])
+    for block in bloques:
+        listaBloque = []
+        cont = 0
+        for permutacion in block:
+            if permutacion[0] <= permutacion[1] and cont < 3:
+                bloque = Bloque()
+                bloque.largo = permutacion[0]
+                bloque.ancho = permutacion[1]      
+                bloque.altura = permutacion[2]
+                listaBloque.append(bloque)
+                cont += 1
+        permutacionesBloques.append(listaBloque)
 
-        
-     
+    #print("############ PERMUTACIONES ############")
+    #for permutacionbloque in permutacionesBloques: 
+    #    print("-----------------------") 
+    #    for bloque in permutacionbloque: 
+    #        print(f'{bloque.largo} / {bloque.ancho} / {bloque.altura}')
+    
     combinacionBloques = Util.get_Lista_Combinaciones(permutacionesBloques) 
-     
-    """
+
+    CombinacionesPermutadas = []
     for combinacion in combinacionBloques: 
-        print("*******************************************************") 
-        for permutacionbloque in combinacion: 
-            print("-----------------------") 
-            for bloque in permutacionbloque: 
-                print(f'{bloque.largo} / {bloque.ancho} / {bloque.altura}')
-    """
+        CombinacionesPermutadas+=Util.permutaciones(combinacion, len(combinacion))
+    
+    combinacionBloques = CombinacionesPermutadas
+     
+    #print("############ COMBINACIONES ############")
+    #for combinacion in combinacionBloques: 
+    #    print("*******************************************************") 
+    #    for permutacionbloque in combinacion: 
+    #        print("-----------------------") 
+    #        for bloque in permutacionbloque: 
+    #            print(f'{bloque.largo} / {bloque.ancho} / {bloque.altura}')
+    
     # Combinaciones Validas
-    
     torres_Total = []#get_Torres(permutacionesBloques,1)
-    
     for combinacion in combinacionBloques:
         temporal=get_Torres(combinacion,1)
         #print(temporal)
         torres_Total.append( temporal)
-    cont = 0
-    
-    for torre in torres_Total:      
+
+    #cont = 0
+    #for torre in torres_Total:      
+    #    for combinacion in torre:
+    #        print("*********************TORRE**********************************")
+    #        for bloque in combinacion: 
+    #            #print("-------------------------")
+    #           #print(bloque)
+    #            cont+=1
+    #            print(f'{bloque.largo} / {bloque.ancho} / {bloque.altura}')           
+    #print(cont)
+
+    torreValidas = []
+    for torre in torres_Total:
         for combinacion in torre:
-            print("*********************TORRE**********************************")
-            for bloque in combinacion: 
-                #print("-------------------------")
-               #print(bloque)
-                cont+=1
-                print(f'{bloque.largo} / {bloque.ancho} / {bloque.altura}')
-                
-    print(cont)
+            torre = Torre()
+            torre.bloques = combinacion
+            if torre.esValida() == True:
+                torreValidas.append(torre)
+    
+    #print("############ TORRES VALIDAS ############")
+    #for torre in torreValidas:
+    #    print("------------------------------")
+    #    for bloque in torre.bloques:
+    #        print(f'{bloque.largo} / {bloque.ancho} / {bloque.altura}')           
+             
+    torreMasAltas=[]
+    for torre in torreValidas:
+        if torreMasAltas == []:
+            torreMasAltas.append(torre)
+        else:
+            if torre.getAltura() > torreMasAltas[-1].getAltura():
+                torreMasAltas=[]
+                torreMasAltas.append(torre)
+            elif torre.getAltura() == torreMasAltas[-1].getAltura():
+                torreMasAltas.append(torre)
+
+    print("############ TORRES MAS ALTAS ############")
+    #for torre in torreMasAltas:
+    #    print("------------------------------")
+    #    print(torre.getAltura())
+    #    for bloque in torre.bloques:
+    #        print(f'{bloque.largo} / {bloque.ancho} / {bloque.altura} ')  
+    
+    for torre in torreMasAltas:
+        print("------------------------------")
+        print(f'Altura: {torre.getAltura()}')
+        print(", ".join([f'({bloque.largo}, {bloque.ancho}, {bloque.altura})' for bloque in torre.bloques]))
 
 def get_Torres(lista_figuras,num):
     
