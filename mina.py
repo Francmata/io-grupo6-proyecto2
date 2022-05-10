@@ -7,6 +7,7 @@ import sys
 #region Fuerza Bruta 
 # -----------------------------------------------------------------------------------------------
 def minaFuerzaBruta(datos:list):
+    start = time.time()
     rutas = getDiccionarioRutas(datos)
     rutas = rutasConstruidas(rutas,len(datos)-1)
     #print(rutas)
@@ -21,11 +22,10 @@ def minaFuerzaBruta(datos:list):
                 rutasMayorGanancia.append(ruta)
             elif getGanancia(ruta,datos) == getGanancia(rutasMayorGanancia[-1],datos):
                 rutasMayorGanancia.append(ruta)
-    
-    for ruta in rutasMayorGanancia:
-        print(", ".join([f'({vertice[0]}, {vertice[1]})' for vertice in ruta]))
-
-    return 
+    end = time.time()
+    print(f'\nOutput : {getGanancia(rutasMayorGanancia[0],datos)}\n')
+    print( " OR\n".join([" -> ".join([f'({vertice[0]}, {vertice[1]})' for vertice in ruta]) for ruta in rutasMayorGanancia]))
+    print(f'\nTiempo de ejecución: {end-start} segundos')
 
 def getGanancia(ruta,datos):
 
