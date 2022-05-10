@@ -7,70 +7,96 @@ import sys
 #region Fuerza Bruta 
 # -----------------------------------------------------------------------------------------------
 def minaFuerzaBruta(datos:list):
-    caminos_posibles=[]
-    largo=len(datos)
-    ancho=len(datos[0])
-    #encontrar_caminos( largo, ancho, 0, 0, [[0,0]], caminos_posibles)
-    #print(caminos_posibles)
-    #for i in range(len(datos)):
-    lista = []
-        #print(i)
-        #lista = []
-    caminos_posibles+=en( largo, ancho, 0, 0,lista )
-    print(caminos_posibles)
+    rutas = getDiccionarioRutas(datos)
+    rutas = rutasConstruidas(rutas,len(datos)-1)
+    #print(rutas)
 
-def encontrar_caminos(largo, ancho, i, j, caminos_posibles):
-    print(caminos)
-    if i== largo-1 or j==ancho-1: 
-        caminos_posibles.append(caminos)
-        return 
-    for camino in (caminos):
-        i= camino
-        j=camino[0]
-        #borde arriba
-        if i==0:
-            encontrar_caminos(largo, ancho, i, j+1, (camino+[[i, j+1],[i+1, j+1]]), caminos_posibles) 
-        #borde abajo
-        elif i==largo-1:
-            encontrar_caminos(largo, ancho, i, j+1, (camino+[[i, j+1],[i-1, j+1]]), caminos_posibles)
-        #medio
+    rutasMayorGanancia=[]
+    for ruta in rutas:
+        if rutasMayorGanancia == []:
+            rutasMayorGanancia.append(ruta)
         else:
-            encontrar_caminos(largo, ancho, i, j+1, (camino+[[i, j+1], [i+1, j+1], [i-1, j+1]]), caminos_posibles) 
+            if getGanancia(ruta,datos) > getGanancia(rutasMayorGanancia[-1],datos):
+                rutasMayorGanancia=[]
+                rutasMayorGanancia.append(ruta)
+            elif getGanancia(ruta,datos) == getGanancia(rutasMayorGanancia[-1],datos):
+                rutasMayorGanancia.append(ruta)
+    
+    for ruta in rutasMayorGanancia:
+        print(", ".join([f'({vertice[0]}, {vertice[1]})' for vertice in ruta]))
 
-def en(largo,ancho, i, j, caminos_posibles):
-    print(f'({i},{j})')
-    caminos_posibles.append([i,j])
-    if j==ancho-1: 
-        return [caminos_posibles]
-        lista = []
-    #borde arriba
-    if i==0:
-        for camino in [[i, j+1],[i+1, j+1]]:
-            i = camino[0]
-            j = camino[1]
-            return en(largo,ancho,i, j,caminos_posibles)
-   #borde abajo
-    elif i==largo-1:
-        for camino in [[i, j+1],[i-1, j+1]]:
-            i = camino[0]
-            j = camino[1]
-            return en(largo,ancho,i, j,caminos_posibles)
-  #medio
-    else:
-        for camino in [[i, j+1], [i+1, j+1], [i-1, j+1]]:
-            i = camino[0]
-            j = camino[1]
-            return en(largo,ancho,i, j,caminos_posibles)
-"""
-def encontrar_caminos(matriz, i, j, caso):
-    print(i, j)
-    if caso==1:
-        return [(i, j)(i, j+1, matriz[i][j]), (i+1, j+1, matriz[i+1][j+1])]
-    elif caso==2:
-        return [(i, j+1, matriz[i][j+1]), (i-1, j+1, matriz[i-1][j+1])]
-    else:
-        return [(i, j+1, matriz[i][j+1]),(i-1, j+1, matriz[i-1][j+1]),(i+1, j+1, matriz[i+1][j+1])]
-"""
+    return 
+
+def getGanancia(ruta,datos):
+
+    ganancia = 0
+
+    for mina in ruta:
+        ganancia += datos[mina[0]][mina[1]]
+    return ganancia
+
+def getDiccionarioRutas(datos:list):
+    largo=len(datos)
+    ancho= len(datos[0])
+
+    caminos=[]
+    for i in range(len(datos)):
+        for j in range(len(datos[0])-1):
+            if i==0:
+                caminos.append([[i,j], [i,j+1], [i+1,j+1]])
+            elif i==len(datos)-1:
+                caminos.append([[i,j], [i,j+1], [i-1,j+1]])
+            else:
+                caminos.append([[i,j], [i,j+1], [i+1,j+1], [i-1,j+1]])
+    return caminos
+def iniciales(largo):
+    tmp = []
+    i = 0
+    while i < largo:
+        tmp.append([i,0])
+        i+=1
+    return tmp
+
+def rutasConstruidas(lista,largo):
+    listaIniciales = iniciales(largo+1)
+    tmp = []
+    for inicial in listaIniciales:
+        tmp = tmp + obtenerRuta([[inicial]],largo,[],lista)
+
+    return tmp
+#               [[[0,1]]], 5,[]
+def obtenerRuta(caminos,num,resultado,lista):
+    
+    for camino in caminos:
+        
+        siguientes = getSiguientes(camino[-1],lista)
+        
+        if(siguientes ==False): return caminos
+        
+        siguientes = siguientes[1:]
+        
+        if(camino[-1][0] == 0 or camino[-1][0]==num):
+            tmp = camino+[siguientes[0]]
+            resultado.append(tmp)
+            tmp = camino+[siguientes[1]]
+            resultado.append(tmp)
+        
+        else:
+            tmp = camino+[siguientes[0]]
+            resultado.append(tmp)
+            tmp = camino+[siguientes[1]]
+            resultado.append(tmp)
+            tmp = camino+[siguientes[2]]
+            resultado.append(tmp)
+    
+    return obtenerRuta(resultado,num,[],lista)
+
+def getSiguientes(vertice,lista):
+    
+    for siguientes in  lista:
+        if(siguientes[0]==vertice):
+            return siguientes
+    return False
 # -----------------------------------------------------------------------------------------------
 #endregion Fuerza Bruta 
 
