@@ -105,3 +105,10 @@ def get_Lista_Permutaciones(lista:list):
 #print(permutaciones(lista, len(lista))) 
 
 # 1,2,3 -> 2,3,1 -> 3,1,2
+"""
+list=[1,2,4,4]
+stack=[]
+resultado = []
+perm(list,stack,resultado)
+print(resultado)
+"""

@@ -70,7 +70,10 @@ def bloquesFuerzaBruta(datos:list):
 
     CombinacionesPermutadas = []
     for combinacion in combinacionBloques: 
-        CombinacionesPermutadas+=Util.permutaciones(combinacion, len(combinacion))
+        resultado = []
+        permutarCombinacion(combinacion,[],resultado)
+        CombinacionesPermutadas+=resultado
+        #CombinacionesPermutadas+=Util.permutaciones(combinacion, len(combinacion))
     
     combinacionBloques = CombinacionesPermutadas
      
@@ -204,11 +207,31 @@ def get_Torres(lista_figuras,num):
     return get_Torres( [listaTmp] + lista_figuras[2:],2)
 
 
-def esValida(bloqueAnterior,bloqueActual):
-    if (bloqueAnterior.largo <= bloqueActual.largo) or\
-        (bloqueAnterior.ancho <= bloqueActual.ancho):
+def esValida(bloqueActual,bloqueSiquiente):
+    if (bloqueActual.largo <= bloqueSiquiente.largo) or\
+        (bloqueActual.ancho <= bloqueSiquiente.ancho):
         return False
     return True
+
+# importing copy module
+import copy
+def permutarCombinacion(combinacion,permutacion,resultado):
+    #print("S:",stack)
+    if not combinacion:
+        resultado.append(copy.deepcopy(permutacion))
+        #print("S:",permutacion)
+    else:               # Cuando no haya alcanzado el nodo hoja del árbol, use la recursividad para continuar mirando hacia abajo.
+        for i in range(len(combinacion)):
+            #print(list[i])#,"<=>",stack[-1]) 
+            if i <= len(combinacion)-2:
+                #print(list)
+                #print(i)
+                if esValida(combinacion[i],combinacion[i+1])==False:#combinacion[i] < combinacion[i+1]:
+                    continue
+            permutacion.append(combinacion[i])
+            del combinacion[i] 
+            permutarCombinacion(combinacion,permutacion,resultado)
+            combinacion.insert(i,permutacion.pop())
 # -----------------------------------------------------------------------------------------------
 #endregion Fuerza Bruta 
 
