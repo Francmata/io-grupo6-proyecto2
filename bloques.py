@@ -41,7 +41,6 @@ def bloquesFuerzaBruta(datos:list):
     
     permutacionesBloques = []
     for block in bloques:
-        listaBloque = []
         cont = 0
         for permutacion in block:
             if permutacion[0] <= permutacion[1] and cont < 3:
@@ -49,15 +48,14 @@ def bloquesFuerzaBruta(datos:list):
                 bloque.largo = permutacion[0]
                 bloque.ancho = permutacion[1]      
                 bloque.altura = permutacion[2]
-                listaBloque.append(bloque)
+                permutacionesBloques.append(bloque)
                 cont += 1
-        permutacionesBloques.append(listaBloque)
 
+    permutacionesBloques = eliminarBloquesRepetidos(permutacionesBloques[0],permutacionesBloques)
     #print("############ PERMUTACIONES ############")
-    #for permutacionbloque in permutacionesBloques: 
+    #for bloque in permutacionesBloques: 
     #    print("-----------------------") 
-    #    for bloque in permutacionbloque: 
-    #        print(f'{bloque.largo} / {bloque.ancho} / {bloque.altura}')
+    #    print(f'{bloque.largo} / {bloque.ancho} / {bloque.altura}')
     
     combinacionBloques = Util.get_Lista_Combinaciones(permutacionesBloques) 
 
@@ -67,14 +65,14 @@ def bloquesFuerzaBruta(datos:list):
     
     combinacionBloques = CombinacionesPermutadas
      
-    #print("############ COMBINACIONES ############")
-    #for combinacion in combinacionBloques: 
-    #    print("*******************************************************") 
-    #    for permutacionbloque in combinacion: 
-    #        print("-----------------------") 
-    #        for bloque in permutacionbloque: 
-    #            print(f'{bloque.largo} / {bloque.ancho} / {bloque.altura}')
-    
+    print("############ COMBINACIONES ############")
+    for combinacion in combinacionBloques: 
+        print("*******************************************************") 
+        for permutacionbloque in combinacion: 
+            print("-----------------------") 
+            for bloque in permutacionbloque: 
+                print(f'{bloque.largo} / {bloque.ancho} / {bloque.altura}')
+    return
     # Combinaciones Validas
     torres_Total = []#get_Torres(permutacionesBloques,1)
     for combinacion in combinacionBloques:
@@ -133,6 +131,37 @@ def bloquesFuerzaBruta(datos:list):
         print(", ".join([f'({bloque.largo}, {bloque.ancho}, {bloque.altura})' for bloque in torre.bloques]))
     print(f'\n Tiempo de ejecución: {end-start} segundos')
 
+def eliminarBloquesRepetidos(bloque,permutacionesBloques):
+    if permutacionesBloques.index(bloque) == len(permutacionesBloques)-1:
+        return permutacionesBloques
+    else:
+        listaEliminarBloques = getListaEliminarBloques(permutacionesBloques,bloque)
+        #print([permutacionesBloques.index(bloqu) for bloqu in listaEliminarBloques])
+        for bloqueEliminar in listaEliminarBloques:
+            permutacionesBloques.remove(bloqueEliminar)
+        siguienteBloque = permutacionesBloques[permutacionesBloques.index(bloque)+1]
+        return eliminarBloquesRepetidos(siguienteBloque,permutacionesBloques)
+
+
+def getListaEliminarBloques(bloques,bloque):
+    cont = 0
+    listaEliminar = []
+    for block in bloques:
+        if bloque.largo == block.largo and bloque.ancho == block.ancho and bloque.altura == block.altura:
+            cont += 1
+            if cont > 1:
+                listaEliminar.append(block)
+    return listaEliminar
+
+def ExisteOtrosBloques(bloques,bloque):
+    cont = 0
+    for block in bloques:
+        if bloque.largo == block.largo and bloque.ancho == block.ancho and bloque.altura == block.altura:
+            cont += 1
+        if cont > 1:
+            return True
+    return False
+
 def get_Torres(lista_figuras,num):
     
     if(len(lista_figuras)==1 and num == 1): 
@@ -175,7 +204,6 @@ if __name__ == '__main__':
     # python ./bloques.py algoritmo archivo.txt
     # ./bloques.py 1 bloques1.txt
     if sys.argv[1] == "1":
-        
         archivo = sys.argv[2].split('.')
         Lineas = Util.abrir_Archivo(sys.argv[2])
         print(Lineas)

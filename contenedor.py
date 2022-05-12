@@ -92,6 +92,89 @@ def meterArticulo(mochila:Mochila,articulo:Articulo):
 # -----------------------------------------------------------------------------------------------
 #endregion Fuerza Bruta
 
+#region Programacion dinamica 
+# -----------------------------------------------------------------------------------------------
+def contenedorProgramacionDinamica(datos:list):
+    start = time.time()
+    W = datos[0][0]
+
+    mochila = Mochila()
+    mochila.peso = W
+    mochila.pesoLibre = W
+    
+    articulos = []
+    cont = 1
+    for arti in datos[1:]:
+        articulo = Articulo()
+        articulo.id = cont
+        articulo.peso = arti[0]       
+        articulo.beneficio = arti[1]
+        articulos.append(articulo)
+        cont+=1
+    #articulo = Articulo()
+    #articulo.beneficio = 0 
+    #articulo.peso = 0 
+    #articulo.id = 0 
+    #
+    #articulos.append(articulo)
+
+    matriz = []
+    for i in range(len(articulos)+1):
+        matriz.append([0] * (W+1))
+    
+    #for fila in matriz:
+    #    print(fila)
+
+    recorrerMatriz(matriz,articulos,W)
+
+    for fila in matriz:
+        print(fila)
+
+    
+    n = len(articulos)
+    beneficioMaximo = matriz[n][W]
+    
+    elementos = encontrarLosElementos(matriz,n,W,articulos,[])
+
+    end = time.time()
+    print(f'Beneficio máximo: {beneficioMaximo}')
+    print(f'Incluidos: {", ".join([str(elemento) for elemento in elementos])}')
+
+    print(f'Tiempo de ejecución: {end-start} segundos')
+    return
+
+def recorrerMatriz(V,articulos,Peso_Maximo):
+    n = len(articulos)+1
+    W = [None]+articulos
+    B = [None]+articulos
+    for i in range(1,n):
+        for w in range(Peso_Maximo+1):
+            #print("(",i," | ",w,")")
+            if W[i].peso > w:
+                V[i][w] = V[i-1][w]
+            else:
+                if B[i].beneficio + V[i-1][w-W[i].peso] > V[i-1][w]:
+                    V[i][w] = B[i].beneficio + V[i-1][w-W[i].peso]
+                else:
+                    V[i][w] = V[i-1][w]
+
+def encontrarLosElementos(V,n,Peso_Maximo,articulos,elementos):
+    W = articulos
+    i=n
+    k=Peso_Maximo
+    #print("(",i," | ",k,") = ",V[i][k])
+    if (i == 0 and k == 0) or V[i][k] == 0:
+        return elementos
+    if V[i][k] != V[i-1][k]:
+        elementos.append(i)
+        i=i-1
+        k=k-W[i].peso
+    else:
+        i=i-1
+    return encontrarLosElementos(V,i,k,articulos,elementos)
+# -----------------------------------------------------------------------------------------------
+#endregion Programacion dinamica
+
 #region Funciones Generales 
 # -----------------------------------------------------------------------------------------------
 
@@ -102,13 +185,13 @@ if __name__ == '__main__':
     #forma_Apropiada_Dos_Fases_Fase_1(None,None)
     #--h es un parámetro de ingreso opcional
     # python ./contenedor.py algoritmo archivo.txt
-    if sys.argv[0] == "1":
+    if sys.argv[1] == "1":
         archivo = sys.argv[2].split('.')
         Lineas = Util.abrir_Archivo(sys.argv[2])
         print(Lineas)
         contenedorFuerzaBruta(Lineas)
-    elif sys.argv[0] == "2":
+    elif sys.argv[1] == "2":
         archivo = sys.argv[2].split('.')
         Lineas = Util.abrir_Archivo(sys.argv[2])
         print(Lineas)
-        #contenedorProgramacionDinamica(Lineas)
+        contenedorProgramacionDinamica(Lineas)
