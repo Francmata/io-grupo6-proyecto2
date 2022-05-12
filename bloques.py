@@ -52,12 +52,21 @@ def bloquesFuerzaBruta(datos:list):
                 cont += 1
 
     permutacionesBloques = eliminarBloquesRepetidos(permutacionesBloques[0],permutacionesBloques)
-    #print("############ PERMUTACIONES ############")
-    #for bloque in permutacionesBloques: 
-    #    print("-----------------------") 
-    #    print(f'{bloque.largo} / {bloque.ancho} / {bloque.altura}')
-    
+    print("############ BLOQUES ############")
+    for bloque in permutacionesBloques: 
+        print("-----------------------") 
+        print(f'{bloque.largo} / {bloque.ancho} / {bloque.altura}')
+
     combinacionBloques = Util.get_Lista_Combinaciones(permutacionesBloques) 
+    
+    #print("############ COMBINACIONES ############")
+    #print(len(combinacionBloques))
+    #for combinacion in combinacionBloques: 
+    #    print("*******************************************************") 
+    #    for bloque in combinacion: 
+    #        #print("-----------------------") 
+    #        #for bloque in permutacionbloque: 
+    #        print(f'{bloque.largo} / {bloque.ancho} / {bloque.altura}')
 
     CombinacionesPermutadas = []
     for combinacion in combinacionBloques: 
@@ -65,20 +74,22 @@ def bloquesFuerzaBruta(datos:list):
     
     combinacionBloques = CombinacionesPermutadas
      
-    print("############ COMBINACIONES ############")
-    for combinacion in combinacionBloques: 
-        print("*******************************************************") 
-        for permutacionbloque in combinacion: 
-            print("-----------------------") 
-            for bloque in permutacionbloque: 
-                print(f'{bloque.largo} / {bloque.ancho} / {bloque.altura}')
-    return
+    print("############ COMBINACIONES PERMUTADAS ############")
+    print(len(combinacionBloques))
+    #return
+    #for combinacion in combinacionBloques: 
+    #    print("*******************************************************") 
+    #    for bloque in combinacion: 
+    #        #print("-----------------------") 
+    #        #for bloque in permutacionbloque: 
+    #        print(f'{bloque.largo} / {bloque.ancho} / {bloque.altura}')
+    torres_Total = combinacionBloques
     # Combinaciones Validas
-    torres_Total = []#get_Torres(permutacionesBloques,1)
-    for combinacion in combinacionBloques:
-        temporal=get_Torres(combinacion,1)
-        #print(temporal)
-        torres_Total.append( temporal)
+    #torres_Total = []#get_Torres(permutacionesBloques,1)
+    #for combinacion in combinacionBloques:
+    #    temporal=get_Torres(combinacion,1)
+    #    #print(temporal)
+    #    torres_Total.append( temporal)
 
     #cont = 0
     #for torre in torres_Total:      
@@ -92,13 +103,12 @@ def bloquesFuerzaBruta(datos:list):
     #print(cont)
 
     torreValidas = []
-    for torre in torres_Total:
-        for combinacion in torre:
-            torre = Torre()
-            torre.bloques = combinacion
-            if torre.esValida() == True:
-                torreValidas.append(torre)
-    
+    for combinacion in torres_Total:
+        torre = Torre()
+        torre.bloques = combinacion
+        if torre.esValida() == True:
+            torreValidas.append(torre)
+
     #print("############ TORRES VALIDAS ############")
     #for torre in torreValidas:
     #    print("------------------------------")
@@ -194,6 +204,11 @@ def get_Torres(lista_figuras,num):
     return get_Torres( [listaTmp] + lista_figuras[2:],2)
 
 
+def esValida(bloqueAnterior,bloqueActual):
+    if (bloqueAnterior.largo <= bloqueActual.largo) or\
+        (bloqueAnterior.ancho <= bloqueActual.ancho):
+        return False
+    return True
 # -----------------------------------------------------------------------------------------------
 #endregion Fuerza Bruta 
 
