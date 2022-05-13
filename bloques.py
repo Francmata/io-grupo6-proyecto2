@@ -235,6 +235,92 @@ def permutarCombinacion(combinacion,permutacion,resultado):
 # -----------------------------------------------------------------------------------------------
 #endregion Fuerza Bruta 
 
+
+#region Programacion dinamica 
+# -----------------------------------------------------------------------------------------------
+def contenedorProgramacionDinamica(datos:list):
+    start = time.time()
+    bloques = []
+    for bloque in datos:
+        bloques.append(Util.permutaciones(bloque, len(bloque)))
+    
+    permutacionesBloques = []
+    for block in bloques:
+        cont = 0
+        for permutacion in block:
+            if permutacion[0] <= permutacion[1] and cont < 3:
+                bloque = Bloque()
+                bloque.largo = permutacion[0]
+                bloque.ancho = permutacion[1]      
+                bloque.altura = permutacion[2]
+                permutacionesBloques.append(bloque)
+                cont += 1
+
+    permutacionesBloques = eliminarBloquesRepetidos(permutacionesBloques[0],permutacionesBloques)
+    print("############ BLOQUES ############")
+    for bloque in permutacionesBloques: 
+        print("-----------------------") 
+        print(f'{bloque.largo} / {bloque.ancho} / {bloque.altura}')
+    
+    anchoTotal = sum([bloque.ancho for bloque in permutacionesBloques])
+    print("anchoTotal: ",anchoTotal)
+    largoTotal = sum([bloque.largo for bloque in permutacionesBloques])
+    print("largoTotal: ",largoTotal)
+    W = anchoTotal if anchoTotal > largoTotal else largoTotal
+    matriz = []
+    for i in range(len(permutacionesBloques)+1):
+        matriz.append([0] * (W+1))
+
+    #for fila in matriz:
+    #    print(fila)
+    recorrerMatriz(matriz,permutacionesBloques,W,anchoTotal,largoTotal)
+    for fila in matriz:
+        print(fila)
+
+    end = time.time()
+    print(f'Tiempo de ejecución: {end-start} segundos')
+
+def recorrerMatriz(V,bloques,Peso_Maximo,anchoTotal,largoTotal):
+    n = len(bloques)+1
+    #BloqueNone = Bloque() 
+    #bloques = [BloqueNone] + bloques
+    W:list[Bloque] = [None]+bloques
+    B:list[Bloque] = [None]+bloques
+    for i in range(1,n):
+        for w in range(Peso_Maximo+1):
+            #print("(",i," | ",w,")")
+            #if w < anchoTotal+1:
+            #if esValida(bloques[i],bloques[i-1]):
+                if W[i].ancho > w or W[i].largo > w:
+                    V[i][w] = V[i-1][w]
+                else:
+                    if B[i].altura + V[i-1][w-W[i].ancho] > V[i-1][w]:
+                        V[i][w] = B[i].altura + V[i-1][w-W[i].ancho]
+                    elif B[i].altura + V[i-1][w-W[i].largo] > V[i-1][w]:
+                        V[i][w] = B[i].altura + V[i-1][w-W[i].largo]
+                    else:
+                        V[i][w] = V[i-1][w]
+                    
+def encontrarLosElementos(V,n,Peso_Maximo,bloques,elementos):
+    W:list[Bloque] = bloques
+    i=n
+    k=Peso_Maximo
+    #print("(",i," | ",k,") = ",V[i][k])
+    if (i == 0 and k == 0) or V[i][k] == 0:
+        return elementos
+    if V[i][k] != V[i-1][k]:
+        elementos.append(i)
+        i=i-1
+        k=k-W[i].largo
+    else:
+        i=i-1
+    return encontrarLosElementos(V,i,k,bloques,elementos)
+
+
+
+# -----------------------------------------------------------------------------------------------
+#endregion Programacion dinamica
+
 def imprimirBloques(bloque):
     print(f'{bloque.largo} / {bloque.ancho} / {bloque.altura}')
 
@@ -250,5 +336,5 @@ if __name__ == '__main__':
         archivo = sys.argv[2].split('.')
         Lineas = Util.abrir_Archivo(sys.argv[2])
         print(Lineas)
-        #contenedorProgramacionDinamica(Lineas)
+        contenedorProgramacionDinamica(Lineas)
 

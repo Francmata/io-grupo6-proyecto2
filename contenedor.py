@@ -139,9 +139,7 @@ def contenedorProgramacionDinamica(datos:list):
     end = time.time()
     print(f'Beneficio máximo: {beneficioMaximo}')
     print(f'Incluidos: {", ".join([str(elemento) for elemento in elementos])}')
-
     print(f'Tiempo de ejecución: {end-start} segundos')
-    return
 
 def recorrerMatriz(V,articulos,Peso_Maximo):
     n = len(articulos)+1
