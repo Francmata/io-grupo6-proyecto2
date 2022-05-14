@@ -1,4 +1,7 @@
 # Imports
+from pickle import OBJ
+from traceback import print_tb
+from pyparsing import null_debug_action
 import Util
 import time
 import sys
@@ -100,6 +103,109 @@ def getSiguientes(vertice,lista):
 # -----------------------------------------------------------------------------------------------
 #endregion Fuerza Bruta 
 
+#region PD 
+# -----------------------------------------------------------------------------------------------
+class Mina:
+    def __init__(self):
+        self.fila = None
+        self.columna = None
+        self.valor = None
+
+def minaProgramacionDinamica(datos):
+    minas=crearMatrizMinas(datos)
+    etapaFinal= obtenerEtapaFinal(datos)
+    etapasProceso= [etapaFinal]
+    etapas=len(datos[0])-1
+    diccionarioRutas=getDiccionarioRutas(minas)
+    nuevoDiccionarioRutas= []
+    for ruta in diccionarioRutas:
+        nuevaRuta=[]
+        for mina in ruta:
+            nuevaRuta.append(buscarMina(minas, mina[0], mina[1]))
+        nuevoDiccionarioRutas.append(nuevaRuta)
+    
+    diccionario={}
+    for ruta in nuevoDiccionarioRutas:
+        diccionario[ruta[0]]= ruta[1:]
+    
+    print(diccionario)
+            
+            
+
+    for n in range(etapas):
+        etapa=crearMatrizEtapa(minas, etapasProceso, etapas-n, diccionario)
+        break
+    return
+
+def crearMatrizEtapa(minas, etapasProceso, etapa, dic):
+    matrizEtapa=[]
+    if len(etapasProceso)==1:
+        for i in range(len(minas)+1):
+            matrizEtapa.append([0] * (len(minas)+3))
+        
+        for i in range (len(matrizEtapa)):
+            for j in range (len(matrizEtapa[0])):
+                if j==0 and i!=0:
+                    mina:Mina = minas[i-1][etapa-1]
+                    matrizEtapa[i][j]= mina.valor
+
+        for i in range(1,len(matrizEtapa)):
+            mina:Mina = minas[i-1][etapa]
+            matrizEtapa[0][i]= mina.valor
+
+        for i in range (1, len(matrizEtapa)):
+            for j in range (1, len(matrizEtapa[0])):
+                fila:Mina= matrizEtapa[i][0]
+                columna:Mina= matrizEtapa[0][j]
+                print("antes del if")
+                if hayRuta(fila, columna, dic):
+                    print("entró")
+                    matrizEtapa[i][j]= fila.valor+columna.valor
+        for i in matrizEtapa:
+            print(i)
+
+    return 
+
+def hayRuta(mina, mina2, dic):
+    print("f")
+    if mina in dic:
+        print("1")
+        if mina2 in dic[mina]:
+            print("2")
+            return True
+    return False
+
+def buscarMina(minas:list[Mina], i , j):
+    for fila in minas:
+        for mina in fila:
+            if mina.columna==j and mina.fila==i:
+                return mina
+    return None
+
+def crearMatrizMinas(datos):
+    matriz= []
+    for i in range (len(datos)):
+        fila=[]
+        for j in range (len(datos[0])):
+            objeto = Mina()
+            objeto.fila = i
+            objeto.columna = j
+            objeto.valor = datos[i][j]
+            fila.append(objeto)
+        matriz.append(fila)
+    return matriz
+
+def obtenerEtapaFinal(minas):
+    pesos=[]
+    for i in range(len(minas)):
+        pesos.append(minas[i][-1])
+    return pesos
+
+ 
+def procesarEtapa():
+    return
+# -----------------------------------------------------------------------------------------------
+#endregion PD
 
 if __name__ == '__main__':
     # python ./mina.py algoritmo archivo.txt
@@ -112,3 +218,4 @@ if __name__ == '__main__':
         archivo = sys.argv[2].split('.')
         Lineas = Util.abrir_Archivo(sys.argv[2])
         print(Lineas)
+        minaProgramacionDinamica(Lineas)
