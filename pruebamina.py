@@ -77,5 +77,21 @@ def convertirDiccionario(Datos):
     return dic
 
 
-print(rutasConstruidas(datos,len(matriz)-1))
+#print(rutasConstruidas(datos,len(matriz)-1))
 #print(obtenerRuta([[[0,0]]], 5,[],datos))
+def maximoEtapaInicial(etapa):
+    numero = etapa[1][-2]
+    resultado = []
+    for x in range(1,len(etapa)):
+        if(etapa[x][-2]> numero):
+            resultado=etapa[x][0]
+            numero = etapa[x][-2]
+        elif(etapa[x][-2] == numero):
+            resultado+=etapa[x][0]
+    return resultado
+
+print(maximoEtapaInicial([['0', '3', '2', '0', '6', '0', '0'],
+['1', '13', '12', '0', '0', '16', ['3']],
+['2', '14', '13', '11', '0', '14', ['3']],
+['5', '0', '16', '14', '16', '16', ['2', '6']],
+['0', '0', '0', '9', '11', '11', ['6']]]))

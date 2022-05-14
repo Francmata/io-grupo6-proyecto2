@@ -140,6 +140,7 @@ def minaProgramacionDinamica(datos):
     
     #for matrizEtapa in etapasProceso:
     #    printMatriz(matrizEtapa)
+    obtenerRutasOptimas(etapasProceso)
 
 def crearMatrizEtapa(minas, etapasProceso, etapa, dic):
     matrizEtapa=[]
@@ -236,9 +237,51 @@ def obtenerEtapaFinal(minas:list[list[Mina]]):
         #print(minas[i][-1])
         pesos.append([minas[i][-1].valor, minas[i][-1].valor, 0])
     return pesos
- 
-def procesarEtapa():
-    return
+
+def maximoEtapaInicial(etapa):
+    print("------")
+    print(etapa)
+    numero = etapa[1][-2]
+    resultado = []
+    for x in range(1,len(etapa)):
+        if(etapa[x][-2]> numero):
+            resultado = []
+            resultado+=[etapa[x][0]]
+            numero = etapa[x][-2]
+        elif(etapa[x][-2] == numero):
+            resultado+=[etapa[x][0]]
+    return resultado
+
+def obtenerOptimoEtapa(mina:Mina, etapa):    
+    return etapa[mina.fila][-1]
+
+# 1 -> [13,[]]
+
+def obtenerRutas(mina,rutasDic,rutas=[]):
+
+    if not mina in rutasDic: return rutas
+    
+    for siguienteMina in rutasDic[mina]:
+        rutas += [siguienteMina]
+        yield obtenerRutas(siguienteMina,rutasDic,rutas)
+    
+
+def obtenerRutasOptimas(tablasEtapas): 
+    rutasDic = crearDiccionarioRutas(tablasEtapas)
+    optimosIniciales = maximoEtapaInicial(tablasEtapas[-1])
+    rutas=[]
+    for optimoInicial in optimosIniciales:
+        rutas += obtenerRutas(optimoInicial,rutasDic,[optimoInicial])
+
+    print(rutas)
+
+def crearDiccionarioRutas(etapas):
+    diccionario = {}
+    
+    for etapa in reversed(etapas[1:]):
+        for fila in etapa[1:]:
+            diccionario[fila[0]]=fila[-1]
+    return diccionario
 # -----------------------------------------------------------------------------------------------
 #endregion PD
 
@@ -254,3 +297,4 @@ if __name__ == '__main__':
         Lineas = Util.abrir_Archivo(sys.argv[2])
         print(Lineas)
         minaProgramacionDinamica(Lineas)
+
