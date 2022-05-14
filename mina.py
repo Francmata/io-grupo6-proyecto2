@@ -1,10 +1,8 @@
 # Imports
-from pickle import OBJ
-from traceback import print_tb
-from pyparsing import null_debug_action
 import Util
 import time
 import sys
+import numpy as np
 
 
 #region Fuerza Bruta 
@@ -110,10 +108,15 @@ class Mina:
         self.fila = None
         self.columna = None
         self.valor = None
+    def __str__(self):
+        return f'{self.valor}'
+        #return f'({self.fila}|{self.columna}) = {self.valor}'
 
 def minaProgramacionDinamica(datos):
     minas=crearMatrizMinas(datos)
-    etapaFinal= obtenerEtapaFinal(datos)
+    etapaFinal= obtenerEtapaFinal(minas)
+    for fila in etapaFinal:
+        print(fila)
     etapasProceso= [etapaFinal]
     etapas=len(datos[0])-1
     diccionarioRutas=getDiccionarioRutas(minas)
@@ -121,61 +124,93 @@ def minaProgramacionDinamica(datos):
     for ruta in diccionarioRutas:
         nuevaRuta=[]
         for mina in ruta:
+            #print(buscarMina(minas, mina[0], mina[1]).__str__())
             nuevaRuta.append(buscarMina(minas, mina[0], mina[1]))
         nuevoDiccionarioRutas.append(nuevaRuta)
     
     diccionario={}
     for ruta in nuevoDiccionarioRutas:
-        diccionario[ruta[0]]= ruta[1:]
+        diccionario[ruta[0]] = ruta[1:]
     
-    print(diccionario)
-            
-            
-
+    #print([f'{key.__str__()}: {diccionario[key]}' for key in diccionario])
+        
     for n in range(etapas):
-        etapa=crearMatrizEtapa(minas, etapasProceso, etapas-n, diccionario)
-        break
-    return
+        matrizEtapa = crearMatrizEtapa(minas, etapasProceso, etapas-n, diccionario) 
+        etapasProceso+=[matrizEtapa]
+    
+    #for matrizEtapa in etapasProceso:
+    #    printMatriz(matrizEtapa)
 
 def crearMatrizEtapa(minas, etapasProceso, etapa, dic):
     matrizEtapa=[]
-    if len(etapasProceso)==1:
-        for i in range(len(minas)+1):
-            matrizEtapa.append([0] * (len(minas)+3))
+    for i in range(len(minas)+1):
+        matrizEtapa.append([0] * (len(minas)+3))
+    
+    for i in range (len(matrizEtapa)):
+        for j in range (len(matrizEtapa[0])):
+            if j==0 and i!=0:
+                mina:Mina = minas[i-1][etapa-1]
+                matrizEtapa[i][j]= mina
+
+    for i in range(1,len(matrizEtapa)):
+        mina:Mina = minas[i-1][etapa]
+        matrizEtapa[0][i]= mina
+
+    for i in range (1, len(matrizEtapa)):
+        for j in range (1, len(matrizEtapa[0])-2):
+            fila:Mina= matrizEtapa[i][0]
+            #columna:Mina= matrizEtapa[0][j]
+            if len(etapasProceso) == 1:
+                etapaAnterior = np.transpose(etapasProceso[-1]) 
+                #print(etapaAnterior)
+                columna = etapaAnterior[1][j]
+            else:
+                #print(etapasProceso[-1])
+                columna = etapasProceso[-1][j][-2]
+            if hayRuta(matrizEtapa[i][0], matrizEtapa[0][j], dic) == True:
+                #print(fila.valor," ",columna)
+                matrizEtapa[i][j]= fila.valor+columna
         
-        for i in range (len(matrizEtapa)):
-            for j in range (len(matrizEtapa[0])):
-                if j==0 and i!=0:
-                    mina:Mina = minas[i-1][etapa-1]
-                    matrizEtapa[i][j]= mina.valor
+    for i in range (1, len(matrizEtapa)):
+        maximo = max(matrizEtapa[i][1:-2])
+        matrizEtapa[i][-2]= maximo
+        indicesMax = extraerIndicesMina(matrizEtapa[i][:-2],maximo)[0]
+        columnas = []
+        for indice in indicesMax:
+            columnas.append(matrizEtapa[0][indice])
+        matrizEtapa[i][-1]=columnas
 
-        for i in range(1,len(matrizEtapa)):
-            mina:Mina = minas[i-1][etapa]
-            matrizEtapa[0][i]= mina.valor
+    print(" ")
+    printMatriz(matrizEtapa)
+    print(" ")
+    return matrizEtapa
 
-        for i in range (1, len(matrizEtapa)):
-            for j in range (1, len(matrizEtapa[0])):
-                fila:Mina= matrizEtapa[i][0]
-                columna:Mina= matrizEtapa[0][j]
-                print("antes del if")
-                if hayRuta(fila, columna, dic):
-                    print("entró")
-                    matrizEtapa[i][j]= fila.valor+columna.valor
-        for i in matrizEtapa:
-            print(i)
 
-    return 
 
-def hayRuta(mina, mina2, dic):
-    print("f")
+def extraerIndicesMina(lst,num):
+    #lst = [13, 4, 20, 15, 6, 20, 20]
+    lst = np.array(lst)
+    result = np.where(lst == num)
+    return result
+
+def printMatriz(matriz:list):
+    for i in range(len(matriz)):
+        if i ==0:
+            print([element.__str__() for element in matriz[i]])
+        else:
+            print([element.__str__() for element in matriz[i][:-1]]+[[element.__str__() for element in matriz[i][-1]]])
+        
+        #if i == 0:
+        #    print([""]+[element.__str__() for element in matriz[i][1:-3]]+["",""])
+        
+
+def hayRuta(mina:Mina, mina2:Mina, dic:dict):
     if mina in dic:
-        print("1")
         if mina2 in dic[mina]:
-            print("2")
             return True
     return False
 
-def buscarMina(minas:list[Mina], i , j):
+def buscarMina(minas:list[list[Mina]], i , j):
     for fila in minas:
         for mina in fila:
             if mina.columna==j and mina.fila==i:
@@ -195,12 +230,12 @@ def crearMatrizMinas(datos):
         matriz.append(fila)
     return matriz
 
-def obtenerEtapaFinal(minas):
-    pesos=[]
+def obtenerEtapaFinal(minas:list[list[Mina]]):
+    pesos=[[0,0,0]]
     for i in range(len(minas)):
-        pesos.append(minas[i][-1])
+        #print(minas[i][-1])
+        pesos.append([minas[i][-1].valor, minas[i][-1].valor, 0])
     return pesos
-
  
 def procesarEtapa():
     return
