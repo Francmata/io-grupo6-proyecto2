@@ -262,25 +262,76 @@ def contenedorProgramacionDinamica(datos:list):
         print("-----------------------") 
         print(f'{bloque.largo} / {bloque.ancho} / {bloque.altura}')
     
-    anchoTotal = sum([bloque.ancho for bloque in permutacionesBloques])
+    anchoTotal = max([bloque.ancho for bloque in permutacionesBloques])
     print("anchoTotal: ",anchoTotal)
-    largoTotal = sum([bloque.largo for bloque in permutacionesBloques])
+    largoTotal = max([bloque.largo for bloque in permutacionesBloques])
     print("largoTotal: ",largoTotal)
     W = anchoTotal if anchoTotal > largoTotal else largoTotal
+    
+    #W = len(permutacionesBloques)
     matriz = []
+    print("w = ",W)
     for i in range(len(permutacionesBloques)+1):
         matriz.append([0] * (W+1))
 
     #for fila in matriz:
     #    print(fila)
-    recorrerMatriz(matriz,permutacionesBloques,W,anchoTotal,largoTotal)
-    for fila in matriz:
-        print(fila)
+    
+    recorrerMatriz(matriz,permutacionesBloques,W)
+    #recorrerMatriz2(matriz,permutacionesBloques,W)
+    n = len(permutacionesBloques)
+    #elementos = encontrarLosElementos(matriz,n,W,permutacionesBloques,[])
+    #print(elementos)
 
+    cont = 0
+    for fila in matriz:
+        print(cont,") ",fila)
+        cont += 1
     end = time.time()
     print(f'Tiempo de ejecución: {end-start} segundos')
 
-def recorrerMatriz(V,bloques,Peso_Maximo,anchoTotal,largoTotal):
+def recorrerMatriz2(V,bloques,Peso_Maximo):
+    n = len(bloques)+1
+    W:list[Bloque] = [None]+bloques
+    B:list[Bloque] = [None]+bloques
+    for i in range(1,n):
+        for w in range(1,n):
+            
+            #print("(",i," | ",w,")")
+            if esValida(B[i],B[w]) == False:#W[i].peso > w:
+                V[i][w] = V[i-1][w]
+            else:
+                # i = 2 w = 2
+                # V[i-1] => (2-1) = 1
+                # [w-W[i].peso] =>(2-3) = -1
+                #V[1][-1] # => 0 <= V[i-1][w-W[i].peso]
+                #B[i].altura # => 4
+                if B[i].altura + B[w].altura > V[i-1][w]:
+                    V[i][w] = B[i].altura + B[w].altura
+                else:
+                    V[i][w] = V[i-1][w]
+
+def encontrarLosElementos2(V,n,Peso_Maximo,bloques,elementos):
+    W:list[Bloque] = [None]+bloques
+    i=n
+    k=Peso_Maximo
+    #print("(",i," | ",k,") = ",V[i][k])
+    if (i == 0 and k == 0) or V[i][k] == 0:
+        return elementos
+    if V[i][k] != V[i-1][k]:
+        elementos.append(i)
+        i=i-1
+        k=k-W[i].largo
+    else:
+        i=i-1
+    return encontrarLosElementos(V,i,k,bloques,elementos)
+
+
+
+
+
+
+def recorrerMatriz(V,bloques,Peso_Maximo):
     n = len(bloques)+1
     #BloqueNone = Bloque() 
     #bloques = [BloqueNone] + bloques
@@ -294,10 +345,11 @@ def recorrerMatriz(V,bloques,Peso_Maximo,anchoTotal,largoTotal):
                 if W[i].ancho > w or W[i].largo > w:
                     V[i][w] = V[i-1][w]
                 else:
-                    if B[i].altura + V[i-1][w-W[i].ancho] > V[i-1][w]:
-                        V[i][w] = B[i].altura + V[i-1][w-W[i].ancho]
-                    elif B[i].altura + V[i-1][w-W[i].largo] > V[i-1][w]:
-                        V[i][w] = B[i].altura + V[i-1][w-W[i].largo]
+                    #print(W[i].largo," <-> ",W[i].ancho)
+                    peso = max([W[i].ancho,W[i].largo])
+                    #print("Peso: ",peso)
+                    if B[i].altura + V[i-1][w-peso] > V[i-1][w]:
+                        V[i][w] = B[i].altura + V[i-1][w-peso]
                     else:
                         V[i][w] = V[i-1][w]
                     

@@ -3,7 +3,7 @@ import Util
 import time
 import sys
 import numpy as np
-
+import copy
 
 #region Fuerza Bruta 
 # -----------------------------------------------------------------------------------------------
@@ -108,17 +108,19 @@ class Mina:
         self.fila = None
         self.columna = None
         self.valor = None
+    
     def __str__(self):
         return f'{self.valor}'
-        #return f'({self.fila}|{self.columna}) = {self.valor}'
+    
+    def imprimir(self):
+        return f'({self.fila}|{self.columna}) = {self.valor}'
 
 def minaProgramacionDinamica(datos):
+    start = time.time()
+
     minas=crearMatrizMinas(datos)
-    etapaFinal= obtenerEtapaFinal(minas)
-    for fila in etapaFinal:
-        print(fila)
-    etapasProceso= [etapaFinal]
-    etapas=len(datos[0])-1
+    
+    # CONVERTIR DICCIONARIO RUTAS
     diccionarioRutas=getDiccionarioRutas(minas)
     nuevoDiccionarioRutas= []
     for ruta in diccionarioRutas:
@@ -127,20 +129,35 @@ def minaProgramacionDinamica(datos):
             #print(buscarMina(minas, mina[0], mina[1]).__str__())
             nuevaRuta.append(buscarMina(minas, mina[0], mina[1]))
         nuevoDiccionarioRutas.append(nuevaRuta)
-    
     diccionario={}
     for ruta in nuevoDiccionarioRutas:
         diccionario[ruta[0]] = ruta[1:]
-    
     #print([f'{key.__str__()}: {diccionario[key]}' for key in diccionario])
-        
+    
+    # CREAR ETAPAS
+    etapaFinal= obtenerEtapaFinal(minas)
+    
+    etapasProceso= [etapaFinal] 
+    etapas=len(datos[0])-1   
     for n in range(etapas):
         matrizEtapa = crearMatrizEtapa(minas, etapasProceso, etapas-n, diccionario) 
-        etapasProceso+=[matrizEtapa]
+        etapasProceso.append(matrizEtapa)
     
-    #for matrizEtapa in etapasProceso:
-    #    printMatriz(matrizEtapa)
-    obtenerRutasOptimas(etapasProceso)
+    # imprimir Etapas
+    for fila in etapaFinal:
+        print(fila)
+    print(" ")
+    for matrizEtapa in etapasProceso[1:]:
+        printMatriz(matrizEtapa)
+        print(" ")
+    
+    rutas = obtenerRutasOptimas(etapasProceso)
+
+
+    end = time.time()
+    print(f'\nOutput : { sum( [ mina.valor for mina in rutas[0] ] ) }\n')
+    print( " OR\n".join([" -> ".join([f'({mina.fila}, {mina.columna})' for mina in ruta]) for ruta in rutas]))
+    print(f'\nTiempo de ejecución: {end-start} segundos')
 
 def crearMatrizEtapa(minas, etapasProceso, etapa, dic):
     matrizEtapa=[]
@@ -181,11 +198,10 @@ def crearMatrizEtapa(minas, etapasProceso, etapa, dic):
             columnas.append(matrizEtapa[0][indice])
         matrizEtapa[i][-1]=columnas
 
-    print(" ")
-    printMatriz(matrizEtapa)
-    print(" ")
+    #print(" ")
+    #printMatriz(matrizEtapa)
+    #print(" ")
     return matrizEtapa
-
 
 
 def extraerIndicesMina(lst,num):
@@ -203,7 +219,6 @@ def printMatriz(matriz:list):
         
         #if i == 0:
         #    print([""]+[element.__str__() for element in matriz[i][1:-3]]+["",""])
-        
 
 def hayRuta(mina:Mina, mina2:Mina, dic:dict):
     if mina in dic:
@@ -239,8 +254,6 @@ def obtenerEtapaFinal(minas:list[list[Mina]]):
     return pesos
 
 def maximoEtapaInicial(etapa):
-    print("------")
-    print(etapa)
     numero = etapa[1][-2]
     resultado = []
     for x in range(1,len(etapa)):
@@ -252,35 +265,37 @@ def maximoEtapaInicial(etapa):
             resultado+=[etapa[x][0]]
     return resultado
 
-def obtenerOptimoEtapa(mina:Mina, etapa):    
-    return etapa[mina.fila][-1]
-
-# 1 -> [13,[]]
-
-def obtenerRutas(mina,rutasDic,rutas=[]):
-
-    if not mina in rutasDic: return rutas
-    
-    for siguienteMina in rutasDic[mina]:
-        rutas += [siguienteMina]
-        yield obtenerRutas(siguienteMina,rutasDic,rutas)
-    
-
 def obtenerRutasOptimas(tablasEtapas): 
     rutasDic = crearDiccionarioRutas(tablasEtapas)
     optimosIniciales = maximoEtapaInicial(tablasEtapas[-1])
     rutas=[]
     for optimoInicial in optimosIniciales:
-        rutas += obtenerRutas(optimoInicial,rutasDic,[optimoInicial])
+        #print(optimoInicial.__str__())
+        roots = []
+        obtenerRutas(optimoInicial,rutasDic,[optimoInicial],roots)
+        rutas+=roots
+        #print("RUTAS -> ",optimoInicial.imprimir())
+        #for items in roots:
+        #    print([item.imprimir() for item in items])
+    return rutas
 
-    print(rutas)
+def obtenerRutas(mina,rutasDic,rutas,roots):
+    #print(mina.__str__())
+    if not mina in rutasDic: 
+        roots+=[copy.deepcopy(rutas)]
+        #print("----------------")
+    else:
+        for siguienteMina in rutasDic[mina]:
+            rutas += [siguienteMina]
+            obtenerRutas(siguienteMina,rutasDic,rutas,roots)
+            #print("cont: ",rutas.index(mina))
+            rutas = rutas[:rutas.index(mina)+1]       
 
 def crearDiccionarioRutas(etapas):
     diccionario = {}
-    
     for etapa in reversed(etapas[1:]):
         for fila in etapa[1:]:
-            diccionario[fila[0]]=fila[-1]
+            diccionario[fila[0]] = fila[-1]
     return diccionario
 # -----------------------------------------------------------------------------------------------
 #endregion PD
