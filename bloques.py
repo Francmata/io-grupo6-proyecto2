@@ -2,6 +2,8 @@
 import Util
 import time
 import sys
+
+#Se crean las clases Torre y Bloque para que el manejo de sus atributos sea más sencillo
 #region Classes
 # -----------------------------------------------------------------------------------------------
 class Bloque():
@@ -15,11 +17,15 @@ class Bloque():
 class Torre():
     def __init__(self):
         self.bloques:list = []
+    
+    # Calcual la altura de la torre
     def getAltura(self):
         altura = 0
         for bloque in self.bloques:
             altura += bloque.altura
         return altura
+    
+    # Verifica si la torre es valida, es decir que lel bloque de abajo mayor al de arriba
     def esValida(self):
         if len(self.bloques) == 1: return True
         for i in range(len(self.bloques)-1):
@@ -36,9 +42,11 @@ class Torre():
 def bloquesFuerzaBruta(datos:list):
     start = time.time()
     bloques = []
+    # se realiza la permutación de los bloques
     for bloque in datos:
         bloques.append(Util.permutaciones(bloque, len(bloque)))
     
+    # se crean los objetos tipo bloque con sus atributos
     permutacionesBloques = []
     for block in bloques:
         cont = 0
@@ -57,6 +65,7 @@ def bloquesFuerzaBruta(datos:list):
         print("-----------------------") 
         print(f'{bloque.largo} / {bloque.ancho} / {bloque.altura}')
 
+    # se realiza la combinación de los bloques entre ellos para crear las torres
     combinacionBloques = Util.get_Lista_Combinaciones(permutacionesBloques) 
     
     #print("############ COMBINACIONES ############")
@@ -68,6 +77,8 @@ def bloquesFuerzaBruta(datos:list):
     #        #for bloque in permutacionbloque: 
     #        print(f'{bloque.largo} / {bloque.ancho} / {bloque.altura}')
 
+    # se realiza las permutaciones de las combinaciones de los bloques para crear torres 
+    # de todas las combinaciones posibles
     CombinacionesPermutadas = []
     for combinacion in combinacionBloques: 
         resultado = []
@@ -105,6 +116,7 @@ def bloquesFuerzaBruta(datos:list):
     #            print(f'{bloque.largo} / {bloque.ancho} / {bloque.altura}')           
     #print(cont)
 
+    # se verifica que las torres creadas sean validas, y si son validad se guardan
     torreValidas = []
     for combinacion in torres_Total:
         torre = Torre()
@@ -117,7 +129,8 @@ def bloquesFuerzaBruta(datos:list):
     #    print("------------------------------")
     #    for bloque in torre.bloques:
     #        print(f'{bloque.largo} / {bloque.ancho} / {bloque.altura}')           
-             
+
+    #Se calcula la o las torres mas altas para el resultado 
     torreMasAltas=[]
     for torre in torreValidas:
         if torreMasAltas == []:
@@ -138,12 +151,14 @@ def bloquesFuerzaBruta(datos:list):
     
     end = time.time()
     
+    #Se imprimen los resultados requeridos 
     for torre in torreMasAltas:
         print("------------------------------")
         print(f'Altura: {torre.getAltura()}')
         print(", ".join([f'({bloque.largo}, {bloque.ancho}, {bloque.altura})' for bloque in torre.bloques]))
     print(f'\n Tiempo de ejecución: {end-start} segundos')
 
+# Se eliminan los bloques repetidos que se pudieron crear en las combinaciones
 def eliminarBloquesRepetidos(bloque,permutacionesBloques):
     if permutacionesBloques.index(bloque) == len(permutacionesBloques)-1:
         return permutacionesBloques
@@ -155,7 +170,7 @@ def eliminarBloquesRepetidos(bloque,permutacionesBloques):
         siguienteBloque = permutacionesBloques[permutacionesBloques.index(bloque)+1]
         return eliminarBloquesRepetidos(siguienteBloque,permutacionesBloques)
 
-
+# Retorna si un bloque es repetido o no
 def getListaEliminarBloques(bloques,bloque):
     cont = 0
     listaEliminar = []
@@ -175,8 +190,8 @@ def ExisteOtrosBloques(bloques,bloque):
             return True
     return False
 
+# Devuleve las torres 
 def get_Torres(lista_figuras,num):
-    
     if(len(lista_figuras)==1 and num == 1): 
         resultado = []
         for permutacion in lista_figuras[0]:
@@ -190,23 +205,18 @@ def get_Torres(lista_figuras,num):
     listaTmp=[]
     
     for i in range(len(lista1)):
-
         for j in range(len(lista2)):
-            
             if(num == 1): 
                # print("lista1 if",lista1[i])
                 #print("lista2 if",lista2[j])
                 listaTmp.append([lista1[i]]+[lista2[j]])
-
             else:
                # print("lista1 else",lista1[i])
                # print("lista2 else",lista2[j])
                 listaTmp.append(lista1[i]+[lista2[j]])
-
-    
     return get_Torres( [listaTmp] + lista_figuras[2:],2)
 
-
+# Valida si el bloque es valido 
 def esValida(bloqueActual,bloqueSiquiente):
     if (bloqueActual.largo <= bloqueSiquiente.largo) or\
         (bloqueActual.ancho <= bloqueSiquiente.ancho):
@@ -220,7 +230,7 @@ def permutarCombinacion(combinacion,permutacion,resultado):
     if not combinacion:
         resultado.append(copy.deepcopy(permutacion))
         #print("S:",permutacion)
-    else:               # Cuando no haya alcanzado el nodo hoja del árbol, use la recursividad para continuar mirando hacia abajo.
+    else:    # Cuando no haya alcanzado el nodo hoja del árbol, use la recursividad para continuar mirando hacia abajo.
         for i in range(len(combinacion)):
             #print(list[i])#,"<=>",stack[-1]) 
             if i <= len(combinacion)-2:
@@ -326,11 +336,6 @@ def encontrarLosElementos2(V,n,Peso_Maximo,bloques,elementos):
         i=i-1
     return encontrarLosElementos(V,i,k,bloques,elementos)
 
-
-
-
-
-
 def recorrerMatriz(V,bloques,Peso_Maximo):
     n = len(bloques)+1
     #BloqueNone = Bloque() 
@@ -367,9 +372,6 @@ def encontrarLosElementos(V,n,Peso_Maximo,bloques,elementos):
     else:
         i=i-1
     return encontrarLosElementos(V,i,k,bloques,elementos)
-
-
-
 # -----------------------------------------------------------------------------------------------
 #endregion Programacion dinamica
 

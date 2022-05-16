@@ -24,22 +24,23 @@ def minaFuerzaBruta(datos:list):
             elif getGanancia(ruta,datos) == getGanancia(rutasMayorGanancia[-1],datos):
                 rutasMayorGanancia.append(ruta)
     end = time.time()
+
+    # Se imprimen los resultados requeridos
     print(f'\nOutput : {getGanancia(rutasMayorGanancia[0],datos)}\n')
     print( " OR\n".join([" -> ".join([f'({vertice[0]}, {vertice[1]})' for vertice in ruta]) for ruta in rutasMayorGanancia]))
     print(f'\nTiempo de ejecución: {end-start} segundos')
 
+# Se calcula la ganancia del camino dado
 def getGanancia(ruta,datos):
-
     ganancia = 0
-
     for mina in ruta:
         ganancia += datos[mina[0]][mina[1]]
     return ganancia
 
+# Se realiza un diccionario de rutas para seguir el camino mas facilmente
 def getDiccionarioRutas(datos:list):
     largo=len(datos)
     ancho= len(datos[0])
-
     caminos=[]
     for i in range(len(datos)):
         for j in range(len(datos[0])-1):
@@ -50,6 +51,8 @@ def getDiccionarioRutas(datos:list):
             else:
                 caminos.append([[i,j], [i,j+1], [i+1,j+1], [i-1,j+1]])
     return caminos
+
+# Se retorna el inicio de los caminos iniciales
 def iniciales(largo):
     tmp = []
     i = 0
@@ -58,24 +61,22 @@ def iniciales(largo):
         i+=1
     return tmp
 
+# Se obtienen las rutas apartir de las posiciones iniciales
 def rutasConstruidas(lista,largo):
     listaIniciales = iniciales(largo+1)
     tmp = []
     for inicial in listaIniciales:
         tmp = tmp + obtenerRuta([[inicial]],largo,[],lista)
-
     return tmp
-#               [[[0,1]]], 5,[]
+
+# Se obtienen las ratas apartir de una posicion y se busca la siguiente 
 def obtenerRuta(caminos,num,resultado,lista):
-    
     for camino in caminos:
-        
         siguientes = getSiguientes(camino[-1],lista)
-        
         if(siguientes ==False): return caminos
-        
         siguientes = siguientes[1:]
-        
+        # Se tienen dos posibles casos, cuando un la posición puede ir a 3 posicion por ser una posicion central 
+        # o 2 posiciones por ser una posicion del costado
         if(camino[-1][0] == 0 or camino[-1][0]==num):
             tmp = camino+[siguientes[0]]
             resultado.append(tmp)
@@ -89,11 +90,10 @@ def obtenerRuta(caminos,num,resultado,lista):
             resultado.append(tmp)
             tmp = camino+[siguientes[2]]
             resultado.append(tmp)
-    
     return obtenerRuta(resultado,num,[],lista)
 
+# Se obtiene la posición a la que se puede ir
 def getSiguientes(vertice,lista):
-    
     for siguientes in  lista:
         if(siguientes[0]==vertice):
             return siguientes
@@ -103,6 +103,7 @@ def getSiguientes(vertice,lista):
 
 #region PD 
 # -----------------------------------------------------------------------------------------------
+# Se crea la clase mina para el un manejo mas facil a la hora de crear el camino
 class Mina:
     def __init__(self):
         self.fila = None
@@ -117,16 +118,13 @@ class Mina:
 
 def minaProgramacionDinamica(datos):
     start = time.time()
-
     minas=crearMatrizMinas(datos)
-    
     # CONVERTIR DICCIONARIO RUTAS
     diccionarioRutas=getDiccionarioRutas(minas)
     nuevoDiccionarioRutas= []
     for ruta in diccionarioRutas:
         nuevaRuta=[]
         for mina in ruta:
-            #print(buscarMina(minas, mina[0], mina[1]).__str__())
             nuevaRuta.append(buscarMina(minas, mina[0], mina[1]))
         nuevoDiccionarioRutas.append(nuevaRuta)
     diccionario={}
@@ -136,14 +134,12 @@ def minaProgramacionDinamica(datos):
     
     # CREAR ETAPAS
     etapaFinal= obtenerEtapaFinal(minas)
-    
     etapasProceso= [etapaFinal] 
     etapas=len(datos[0])-1   
     for n in range(etapas):
         matrizEtapa = crearMatrizEtapa(minas, etapasProceso, etapas-n, diccionario) 
         etapasProceso.append(matrizEtapa)
-    
-    # imprimir Etapas
+    # imprimir Etapas de forma que se vizualice correctamente
     for fila in etapaFinal:
         print(fila)
     print(" ")
@@ -152,28 +148,28 @@ def minaProgramacionDinamica(datos):
         print(" ")
     
     rutas = obtenerRutasOptimas(etapasProceso)
-
-
     end = time.time()
+    # Se imprimen los resultados requeridos
     print(f'\nOutput : { sum( [ mina.valor for mina in rutas[0] ] ) }\n')
     print( " OR\n".join([" -> ".join([f'({mina.fila}, {mina.columna})' for mina in ruta]) for ruta in rutas]))
     print(f'\nTiempo de ejecución: {end-start} segundos')
 
+# Se crea la matriz para ca una de las etapas 
 def crearMatrizEtapa(minas, etapasProceso, etapa, dic):
     matrizEtapa=[]
     for i in range(len(minas)+1):
         matrizEtapa.append([0] * (len(minas)+3))
-    
+    #Se colocan los valores a la fila 0
     for i in range (len(matrizEtapa)):
         for j in range (len(matrizEtapa[0])):
             if j==0 and i!=0:
                 mina:Mina = minas[i-1][etapa-1]
                 matrizEtapa[i][j]= mina
-
+    # Se colocan los valores a la columna 0
     for i in range(1,len(matrizEtapa)):
         mina:Mina = minas[i-1][etapa]
         matrizEtapa[0][i]= mina
-
+    #se colocan los valores en el resto de la matriz
     for i in range (1, len(matrizEtapa)):
         for j in range (1, len(matrizEtapa[0])-2):
             fila:Mina= matrizEtapa[i][0]
@@ -220,12 +216,14 @@ def printMatriz(matriz:list):
         #if i == 0:
         #    print([""]+[element.__str__() for element in matriz[i][1:-3]]+["",""])
 
+# Se busca si una posicion puede ir a otra
 def hayRuta(mina:Mina, mina2:Mina, dic:dict):
     if mina in dic:
         if mina2 in dic[mina]:
             return True
     return False
 
+# Se busca la mina para tomar sus valores
 def buscarMina(minas:list[list[Mina]], i , j):
     for fila in minas:
         for mina in fila:
@@ -233,6 +231,7 @@ def buscarMina(minas:list[list[Mina]], i , j):
                 return mina
     return None
 
+# Se crean los objetos tipo mina para que un manejo mas sencillo
 def crearMatrizMinas(datos):
     matriz= []
     for i in range (len(datos)):
@@ -246,6 +245,7 @@ def crearMatrizMinas(datos):
         matriz.append(fila)
     return matriz
 
+# Se obtiene la ultima etapa de cada problema 
 def obtenerEtapaFinal(minas:list[list[Mina]]):
     pesos=[[0,0,0]]
     for i in range(len(minas)):
@@ -253,6 +253,7 @@ def obtenerEtapaFinal(minas:list[list[Mina]]):
         pesos.append([minas[i][-1].valor, minas[i][-1].valor, 0])
     return pesos
 
+#Se obtiene el maximo valor de los resultados de las tablas de cada etapa 
 def maximoEtapaInicial(etapa):
     numero = etapa[1][-2]
     resultado = []
@@ -265,6 +266,7 @@ def maximoEtapaInicial(etapa):
             resultado+=[etapa[x][0]]
     return resultado
 
+# Se obtiene las rutas optimas
 def obtenerRutasOptimas(tablasEtapas): 
     rutasDic = crearDiccionarioRutas(tablasEtapas)
     optimosIniciales = maximoEtapaInicial(tablasEtapas[-1])
@@ -279,6 +281,7 @@ def obtenerRutasOptimas(tablasEtapas):
         #    print([item.imprimir() for item in items])
     return rutas
 
+# Se obtiene los caminos apartir de los diccionarios
 def obtenerRutas(mina,rutasDic,rutas,roots):
     #print(mina.__str__())
     if not mina in rutasDic: 
@@ -291,6 +294,7 @@ def obtenerRutas(mina,rutasDic,rutas,roots):
             #print("cont: ",rutas.index(mina))
             rutas = rutas[:rutas.index(mina)+1]       
 
+# Se crea un diccionario de rutas para facilidad de encontrar caminos
 def crearDiccionarioRutas(etapas):
     diccionario = {}
     for etapa in reversed(etapas[1:]):
